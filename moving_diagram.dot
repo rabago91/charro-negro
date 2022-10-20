@@ -1,0 +1,23 @@
+digraph G {
+    rankdir=LR
+    graph [pad="0.2", ranksep=".8", nodesep="0.2"];
+    node [shape="box", fontname = "helvetica", style=filled, color="#bbbbbb"]
+    edge [fontname = "Courier New", fontsize  = 11, labelfloat=false, color="#ffffff"];
+
+    subgraph cluster_1{
+        label = "Move / Animate / colision detection"
+        fontcolor="#ffffff"
+        fontname = "helvetica"
+        style=filled;
+        color="#444444";
+
+        "createPlayer()","animation()","KeyEventListeners","KeyDownCombos(character)"[color=red];
+
+        "setup"->"gameLoop()"->"KeyDownCombos(character)"->"animation()";
+        "setup"->"createPlayerSheet()","createPlayer()"
+        "gameLoop()"->"createPlayerBox()","createPlayerBoxB()"
+        "KeyEventListeners"->"KeyDownCombos(character)"->"Move(direction,character)"->"character.position","verify_collision(direction, character)"
+        "KeyEventListeners"->"animation()"[color=red];
+    }
+     
+}

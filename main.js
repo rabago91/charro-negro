@@ -54,7 +54,7 @@ let mapArrayRawData = [];
             x:app.view.width / 2,
             y:(app.view.height / 2)-130
         }
-        playerProta = createPlayer('THE PROTA', playerStartPoint.x, playerStartPoint.y, playerProtaSheet);
+        playerProta = createPlayer('THE PROTA', playerStartPoint.x, playerStartPoint.y, playerProtaSheet, 5);
         app.stage.addChild(playerProta);
         createOldBoxes(Boxes);
         app.ticker.add(gameLoop);
@@ -92,45 +92,87 @@ let mapArrayRawData = [];
     }
 
     function verifyPlayerCollisions (direction, character, scenarioArray) {
-        var tmpPlayer;
+        var tmpPlayerA;
+        var tmpPlayerB;
 
         switch(direction){
-            case "goLeft" : tmpPlayer = {
+            case "goLeft" : 
+            tmpPlayerA = {
                 x: character.x - character.width/2 - character.speed,
                 y: character.y - character.height/1,
                 width: character.width,
                 height: character.height
             }
+            tmpPlayerB = {
+                x: character.x - character.speed,
+                y: character.y,
+                width: character.width,
+                height: character.height
+            }
             break;
-            case "goRight" : tmpPlayer = {
+            case "goRight" : 
+            tmpPlayerA = {
                 x: character.x - character.width/2 + character.speed,
                 y: character.y - character.height/1,
                 width: character.width,
                 height: character.height
             }
+            tmpPlayerB = {
+                x: character.x + character.speed,
+                y: character.y,
+                width: character.width,
+                height: character.height
+            }
             break;
-            case "goUp" : tmpPlayer = {
+            case "goUp" : 
+            tmpPlayerA = {
                 x: character.x - character.width/5, //Adapted for this character
                 y: character.y - character.height/1 - character.speed,
                 width: character.width*2/5, //Adapted for this character
                 height: character.height
             }
+            tmpPlayerB = {
+                x: character.x,
+                y: character.y,
+                width: character.width, 
+                height: character.height
+            }
             break;
-            case "goDown" : tmpPlayer = {
+            case "goDown" : 
+            tmpPlayerA = {
                 x: character.x - character.width/5, //Adapted for this character
                 y: character.y - character.height/1 + character.speed,
                 width: character.width*2/5, //Adapted for this character
+                height: character.height
+            }
+            tmpPlayerB = {
+                x: character.x,
+                y: character.y + character.speed,
+                width: character.width,
                 height: character.height
             }
             break;
         }
 
         for (var x in scenarioArray) {
-            if ( colides( tmpPlayer, scenarioArray[x] ) ) {
+            // if ( colides( tmpPlayerA, scenarioArray[x]) || colides( tmpPlayerB, scenarioArray[x] ) ) {
+            if ( colides( tmpPlayerA, scenarioArray[x])) {
                 if (!!scenarioArray[x].isFloor) {
                     return false
                 }
                 console.log(character.name + " crashed with: " + scenarioArray[x].type);
+                // console.log(
+                //     'objectA.x = ' + tmpPlayerA.x + ';',
+                //     'objectA.y = ' + tmpPlayerA.y + ';',
+                //     'objectA.width = ' + tmpPlayerA.width + ';',
+                //     'objectA.height = ' + tmpPlayerA.height + ';',
+                // );
+                // console.log(
+                //     'objectB.x = ' + scenarioArray[x].x + ';',
+                //     'objectB.y = ' + scenarioArray[x].y + ';',
+                //     'objectB.width = ' + scenarioArray[x].width + ';',
+                //     'objectB.height = ' + scenarioArray[x].height + ';',
+                // );
                 return true
             }
         }
@@ -160,13 +202,13 @@ let mapArrayRawData = [];
     }
     
     function moveAndCollisionPlayer(direction, character){
-        var playerCollisionsBoxes = verifyPlayerCollisions(direction, character, Boxes);
+        // var playerCollisionsBoxes = verifyPlayerCollisions(direction, character, Boxes);
         var playerCollisionsMap = verifyPlayerCollisions(direction, character, mapArrayRawData);
     
-        if(playerCollisionsMap || playerCollisionsBoxes){
-            let characterBoundaries = {
-                
-            }
+        // if(playerCollisionsMap || playerCollisionsBoxes){
+        // if(playerCollisionsBoxes){
+        if(playerCollisionsMap){
+            // let characterBoundaries = {}
             return false
         }
         if(direction == "goLeft") character.x -= character.speed;

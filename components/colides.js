@@ -10,11 +10,6 @@ export default function colides(a, b){
     let bBottom = b.y + b.height;
     let bTop = b.y;
 
-    // if (!(aRight > bLeft)) console.log(`${a}.x + ${a}.width < ${b}.x`);
-    // if (!(aLeft < bRight)) console.log(`${a}.x > ${b}.x + ${b}.width`);
-    // if (!(aBottom > bTop)) console.log(`${a}.y + ${a}.height < ${b}.y`);
-    // if (!(aTop < bBottom)) console.log(`${a}.y > ${b}.y + ${b}.height`);
-
     if (
         aRight >= bLeft &&
         aLeft <= bRight &&

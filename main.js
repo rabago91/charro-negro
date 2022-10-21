@@ -21,7 +21,8 @@ let mapArrayRawData = [];
     window.onload = function() {
 
     //Add the canvas that Pixi automatically created for you to the HTML document
-    document.body.appendChild(app.view);
+    // document.body.appendChild(app.view);
+    document.getElementById("game").appendChild(app.view);
 
     app.loader
         .add(["src/spritesheets/spritesheet.json"]) //Character

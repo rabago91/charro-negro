@@ -1,5 +1,6 @@
-export default function createPlayer (playerName, x, y, characterSheet, speed = 2, scale = 4, width, height) {
+export default function createPlayer (playerName, x, y, characterSheet, speed = 2, scale, width, height) {
     let player = new PIXI.AnimatedSprite(characterSheet["Idle_South"]);
+    
     player.name = playerName
     player.anchor.set(0.5, 1);
     player.animationSpeed = .2;
@@ -7,10 +8,9 @@ export default function createPlayer (playerName, x, y, characterSheet, speed = 
     player.x = x;
     player.y = y;
     player.speed = speed;
-    player.scale.set(scale);
+    if(!scale){player.scale.set(4)}else{player.scale.set(scale)};
     player.sheet = characterSheet;
     player.textures = player.sheet["Idle_South"];
-    //player.isIdle;
     player.movingUp;
     player.movingDown;
     player.movingLeft;

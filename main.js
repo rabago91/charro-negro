@@ -54,7 +54,7 @@ let mapArrayRawData = [];
             x:app.view.width / 2,
             y:(app.view.height / 2)-130
         }
-        playerProta = createPlayer('THE PROTA', playerStartPoint.x, playerStartPoint.y, playerProtaSheet, 5);
+        playerProta = createPlayer('THE PROTA', playerStartPoint.x, playerStartPoint.y, playerProtaSheet, 5,10);
         app.stage.addChild(playerProta);
         createOldBoxes(Boxes);
         app.ticker.add(gameLoop);
@@ -155,17 +155,19 @@ let mapArrayRawData = [];
         }
 
         for (var x in scenarioArray) {
-            // if ( colides( tmpPlayerA, scenarioArray[x]) || colides( tmpPlayerB, scenarioArray[x] ) ) {
-            if ( colides( tmpPlayerA, scenarioArray[x])) {
+            // var temporalPlayer = tmpPlayerB;
+            
+            if ( colides( tmpPlayerA, scenarioArray[x]) || colides( tmpPlayerB, scenarioArray[x] ) ) {
+            // if ( colides( temporalPlayer, scenarioArray[x])) {
                 if (!!scenarioArray[x].isFloor) {
                     return false
                 }
                 console.log(character.name + " crashed with: " + scenarioArray[x].type);
                 // console.log(
-                //     'objectA.x = ' + tmpPlayerA.x + ';',
-                //     'objectA.y = ' + tmpPlayerA.y + ';',
-                //     'objectA.width = ' + tmpPlayerA.width + ';',
-                //     'objectA.height = ' + tmpPlayerA.height + ';',
+                //     'objectA.x = ' + temporalPlayer.x + ';',
+                //     'objectA.y = ' + temporalPlayer.y + ';',
+                //     'objectA.width = ' + temporalPlayer.width + ';',
+                //     'objectA.height = ' + temporalPlayer.height + ';',
                 // );
                 // console.log(
                 //     'objectB.x = ' + scenarioArray[x].x + ';',

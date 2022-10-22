@@ -17,8 +17,8 @@ export default function createPlayer (playerName, x, y, characterSheet, speed = 
     player.movingRight;
     player.actualAnimation = "Idle_";
     player.lastDirection = "South";
-    if(width)player.width = width;
-    if(height)player.height = height;
+    // if(width)player.width = width;
+    // if(height)player.height = height;
     player.play();
 
     player.setMoveUp = function (){

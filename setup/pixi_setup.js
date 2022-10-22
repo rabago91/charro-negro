@@ -1,5 +1,4 @@
 //settings
-// PIXI.settings.RESOLUTION = window.devicePixelRatio;
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 //Aliases

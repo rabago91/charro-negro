@@ -1,8 +1,8 @@
 import {app} from "../setup/pixi_setup.js"
 
-export default function createOldBoxes(Boxes){
-    for(var i in Boxes){
-        createBox(Boxes[i])
+export default function createOldBoxes(boxesArray){
+    for(var i in boxesArray){
+        createBox(boxesArray[i])
     }
 }
 

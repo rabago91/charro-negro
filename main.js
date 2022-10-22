@@ -3,6 +3,7 @@ import createPlayerSheet from "./components/sheets/player_sheet.js";
 import fireBullet from "./components/create_bullet.js";
 import createOldBoxes from "./components/create_old_boxes.js"
 import colides from "./components/colides.js";
+import colidesSide from "./components/colisionSide.js";
 import createMapSheet from "./components/sheets/map_sheet.js";
 import createPlayer from "./components/create_player.js";
 import updateBullets from "./components/update_bullets.js";
@@ -16,11 +17,13 @@ var playerScale = 2;
 var playerWidth = 15;
 var playerHeight = 22;
 var playerSpeed = 3;
-var playerSafeMargin = 5;
+var playerSafeMargin = 40;
+var playerSafebox = {};
 let keys = {};
 let protaBullets = [];
 let mapSheet = {};
 let mapArrayRawData = [];
+
 
 
 // export default function runGame() {
@@ -53,17 +56,22 @@ window.onload = function () {
         mapSheet = createMapSheet();
         let map = createMap(mapSheet, mapArrayData, hotizontalTilesNum);
         let mapArray = map.tileMapArray;
-        mapArray.map((tile) => app.stage.addChild(tile));
+        mapArray.forEach((tile) => app.stage.addChild(tile));
         mapArrayRawData = map.mapArrayRawData;
 
         playerProtaSheet = createPlayerSheet();
         currentPlayerPosition = {
-            x: app.view.width / 2,
-            y: (app.view.height / 2) - 130
+            x: app.view.width / 2 - 40,
+            y: (app.view.height / 2) + 50,
+            type: "currentPlayerPosition"
         }
+
+        playerSafebox = createObjectWithAdjustedCoordinates(currentPlayerPosition.x, currentPlayerPosition.y, playerWidth, playerHeight, playerSafeMargin, playerScale, "PlayerSafebox");
+
         playerProta = createPlayer('THE PROTA', currentPlayerPosition.x, currentPlayerPosition.y, playerProtaSheet, playerSpeed, playerScale);
         app.stage.addChild(playerProta);
         createOldBoxes(Boxes);
+
         app.ticker.add(gameLoop);
     }
 
@@ -97,176 +105,46 @@ window.onload = function () {
     //     playerBoxB.endFill();
     //     app.stage.addChild(playerBoxB);
     // }
-    var playerSafebox = new PIXI.Graphics();
 
-    function createPlayerSafebox(safebox, x, y, width, height, margin, scale) {
-        safebox.clear();
-        safebox.beginFill("0xff00ff");
-        let finalWidth = width*scale;
-        let finalHeight = height*scale;
-        safebox.drawRect(
-            x - finalWidth/2 - margin,
-            y - finalHeight - margin,
-            finalWidth + margin*2,
-            finalHeight + margin*2
-        );
-        safebox.alpha = .3;
-        safebox.endFill();
-        app.stage.addChild(safebox);
+
+    function createObjectWithAdjustedCoordinates(x, y, width, height, margin, scale, type) {
+        // The characters in this code are created from the center un X and in the bottom Y, this function creates an object that reinterpretes the position in the Top Left corner, and adds a margin.
+        let object = {};
+        let finalWidth = width * scale;
+        let finalHeight = height * scale;
+
+        object.x = x - finalWidth / 2 - margin;
+        object.y = y - finalHeight - margin;
+        object.width = finalWidth + margin * 2;
+        object.height = finalHeight + margin * 2;
+        object.margin = margin;
+        object.sacale = scale;
+        object.type = type;
+
+        return object;
     }
 
-    var currentPlayerPositionXYpoint = new PIXI.Graphics();
-    function createCurrentPlayerPositionXYpoint() {
-        currentPlayerPositionXYpoint.clear();
-        currentPlayerPositionXYpoint.beginFill("0x27FF00");
-        currentPlayerPositionXYpoint.drawCircle(
-            currentPlayerPosition.x,
-            currentPlayerPosition.y,
-            5,
-        );
-        currentPlayerPositionXYpoint.alpha = .8;
-        currentPlayerPositionXYpoint.endFill();
-        app.stage.addChild(currentPlayerPositionXYpoint);
+
+    var playerSafeboxGraphic = new PIXI.Graphics();
+    function drawRectangle(pixiGraphicObject, x, y, width, height, color, opacity) {
+        pixiGraphicObject.clear();
+        pixiGraphicObject.beginFill(color);
+        pixiGraphicObject.drawRect(x, y, width, height);
+        pixiGraphicObject.alpha = opacity;
+        pixiGraphicObject.endFill();
+        app.stage.addChild(pixiGraphicObject);
     }
 
-    function verifyPlayerCollisions(direction, character, scenarioArray) {
-        var tmpPlayerA;
-        var tmpPlayerB;
+    var safeboxXYPoint = new PIXI.Graphics();
+    var playerXYPoint = new PIXI.Graphics();
 
-        let finalWidth = playerWidth*playerScale;
-        let finalHeight = playerHeight*playerScale;
-
-        let playerSafebox = {
-            x: currentPlayerPosition.x - finalWidth/2 - playerSafeMargin,
-            y: currentPlayerPosition.y - finalHeight - playerSafeMargin,
-            width: finalWidth + playerSafeMargin*2,
-            height: finalHeight + playerSafeMargin*2
-        }
-
-        switch (direction) {
-            case "goLeft":
-                tmpPlayerA = {
-                    // x: character.x - character.width / 2 - character.speed,
-                    // y: character.y - character.height / 1,
-                    // width: character.width,
-                    // height: character.height
-                    x: currentPlayerPosition.x - character.width/2 - playerSafeMargin,
-                    y: currentPlayerPosition.y - character.height - playerSafeMargin,
-                    width: 30 + playerSafeMargin*2,
-                    height: 88 + playerSafeMargin*2
-                }
-                // tmpPlayerB = {
-                //     x: character.x - character.speed,
-                //     y: character.y,
-                //     width: character.width,
-                //     height: character.height
-                // }
-                break;
-            case "goRight":
-                tmpPlayerA = {
-                    // x: character.x - character.width / 2 + character.speed,
-                    // y: character.y - character.height / 1,
-                    // width: character.width,
-                    // height: character.height
-                    x: currentPlayerPosition.x - character.width/2 - playerSafeMargin,
-                    y: currentPlayerPosition.y - character.height - playerSafeMargin,
-                    width: 30 + playerSafeMargin*2,
-                    height: 88 + playerSafeMargin*2
-                }
-                // tmpPlayerB = {
-                //     x: character.x + character.speed,
-                //     y: character.y,
-                //     width: character.width,
-                //     height: character.height
-                // }
-                break;
-            case "goUp":
-                tmpPlayerA = {
-                    // x: character.x - character.width / 5, //Adapted for this character
-                    // y: character.y - character.height / 1 - character.speed,
-                    // width: character.width * 2 / 5, //Adapted for this character
-                    // height: character.height
-                    x: currentPlayerPosition.x - character.width/2 - playerSafeMargin,
-                    y: currentPlayerPosition.y - character.height - playerSafeMargin,
-                    width: 30 + playerSafeMargin*2,
-                    height: 88 + playerSafeMargin*2
-                }
-                // tmpPlayerB = {
-                //     x: character.x,
-                //     y: character.y,
-                //     width: character.width,
-                //     height: character.height
-                // }
-                break;
-            case "goDown":
-                tmpPlayerA = {
-                    // x: character.x - character.width / 5, //Adapted for this character
-                    // y: character.y - character.height / 1 + character.speed,
-                    // width: character.width * 2 / 5, //Adapted for this character
-                    // height: character.height
-                    x: currentPlayerPosition.x - character.width/2 - playerSafeMargin,
-                    y: currentPlayerPosition.y - character.height - playerSafeMargin ,
-                    width: 30 + playerSafeMargin*2,
-                    height: 88 + playerSafeMargin*2
-                }
-                // tmpPlayerB = {
-                //     x: character.x,
-                //     y: character.y + character.speed,
-                //     width: character.width,
-                //     height: character.height
-                // }
-                break;
-        }
-
-        for (var x in scenarioArray) {
-            // var temporalPlayer = tmpPlayerB;
-            var collisionTemporalPlayerSafebox = colides(playerSafebox, scenarioArray[x]);
-            // var collisionTemporalPlayerB = colides(tmpPlayerB, scenarioArray[x]);
-
-            // if ( colides( tmpPlayerA, scenarioArray[x]) || colides( tmpPlayerB, scenarioArray[x] ) ) {
-            if (collisionTemporalPlayerSafebox) {
-
-
-                if (!!scenarioArray[x].isFloor) {
-                    return false
-                }
-
-                console.log("collisionTemporalPlayerSafebox || " + character.name + " crashed with: " + scenarioArray[x].type);
-                console.log(
-                    'objectA.x = ' + tmpPlayerA.x + ';',
-                    'objectA.y = ' + tmpPlayerA.y + ';',
-                    'objectA.width = ' + tmpPlayerA.width + ';',
-                    'objectA.height = ' + tmpPlayerA.height + ';',
-                );
-                console.log(
-                    'objectB.x = ' + scenarioArray[x].x + ';',
-                    'objectB.y = ' + scenarioArray[x].y + ';',
-                    'objectB.width = ' + scenarioArray[x].width + ';',
-                    'objectB.height = ' + scenarioArray[x].height + ';',
-                );
-                return true
-                // } else if (collisionTemporalPlayerB){
-                //     if (!!scenarioArray[x].isFloor) {
-                //         return false
-                //     }
-
-                //     console.log("collisionTemporalPlayerB || " + character.name + " crashed with: " + scenarioArray[x].type);
-                //     // console.log(
-                //     //     'objectA.x = ' + temporalPlayer.x + ';',
-                //     //     'objectA.y = ' + temporalPlayer.y + ';',
-                //     //     'objectA.width = ' + temporalPlayer.width + ';',
-                //     //     'objectA.height = ' + temporalPlayer.height + ';',
-                //     // );
-                //     // console.log(
-                //     //     'objectB.x = ' + scenarioArray[x].x + ';',
-                //     //     'objectB.y = ' + scenarioArray[x].y + ';',
-                //     //     'objectB.width = ' + scenarioArray[x].width + ';',
-                //     //     'objectB.height = ' + scenarioArray[x].height + ';',
-                //     // );
-                //     return true
-            }
-        }
-        return false;
+    function drawCircle(pixiObject, x, y, diameter, color) {
+        pixiObject.clear();
+        pixiObject.beginFill(color);
+        pixiObject.drawCircle(x, y, diameter);
+        pixiObject.alpha = .8;
+        pixiObject.endFill();
+        app.stage.addChild(pixiObject);
     }
 
     function keysDown(e) {
@@ -284,50 +162,129 @@ window.onload = function () {
         playerProta.play();
     }
 
-    function characterMovement(character, virtualPosition) {
-        if (character.movingLeft) moveAndCollisionPlayer("goLeft", character, virtualPosition);
-        if (character.movingRight) moveAndCollisionPlayer("goRight", character, virtualPosition);
-        if (character.movingUp) moveAndCollisionPlayer("goUp", character, virtualPosition);
-        if (character.movingDown) moveAndCollisionPlayer("goDown", character, virtualPosition);
+
+    function verifyCollisionToObjectsArray(safeColideObject, collidablesObjectArray) {
+        let doesCollides = false;
+        let lastCollidingObject = {};
+        collidablesObjectArray.forEach(element => {
+            if (!element.isFloor) {
+                if (colides(safeColideObject, element)) {
+                    console.log("collisionPlayerSafebox || " + safeColideObject.type + " crashed with: " + element.type);
+                    console.log(
+                        'objectA.x = ' + safeColideObject.x + ';',
+                        'objectA.y = ' + safeColideObject.y + ';',
+                        'objectA.width = ' + safeColideObject.width + ';',
+                        'objectA.height = ' + safeColideObject.height + ';',
+                    );
+                    console.log(
+                        'objectB.x = ' + element.x + ';',
+                        'objectB.y = ' + element.y + ';',
+                        'objectB.width = ' + element.width + ';',
+                        'objectB.height = ' + element.height + ';',
+                    );
+                    console.log('COLLIDING:TRUE');
+                    doesCollides = true;
+                    lastCollidingObject = element;
+                }
+            }
+        });
+
+        return [doesCollides,lastCollidingObject]
     }
 
-    function moveAndCollisionPlayer(direction, character, virtualPosition) {
-        var playerCollisionsBoxes = verifyPlayerCollisions(direction, character, Boxes);
-        var playerCollisionsMap = verifyPlayerCollisions(direction, character, mapArrayRawData);
+    function characterMovement(character, followingObjectsArray, collidablesObjectArray) {
+        let localSafeBox = followingObjectsArray[0];
+        let pushBackValue = 1;
 
-        if(playerCollisionsMap || playerCollisionsBoxes){
-        // if(playerCollisionsBoxes){
-        // if (playerCollisionsMap) {
-            // let characterBoundaries = {}
-            return false
+        if (character.movingLeft) {
+            let collideVerification = verifyCollisionToObjectsArray(localSafeBox, collidablesObjectArray);
+            if (!collideVerification[0]) {
+                character.x -= character.speed;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].x -= character.speed;
+                }
+            } else {
+                character.x += pushBackValue;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].x += pushBackValue;
+                }
+            }
         }
-        if (direction == "goLeft") {
-             character.x -= character.speed;
-             virtualPosition.x -= character.speed;
+        if (character.movingRight) {
+            let collideVerification = verifyCollisionToObjectsArray(localSafeBox, collidablesObjectArray);
+            if (!collideVerification[0]) {
+                character.x += character.speed;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].x += character.speed;
+                }
+            } else {
+                character.x -= pushBackValue;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].x -= pushBackValue;
+                }
             }
-        if (direction == "goRight") {
-             character.x += character.speed;
-             virtualPosition.x += character.speed;
+        }
+        if (character.movingUp) {
+            let collideVerification = verifyCollisionToObjectsArray(localSafeBox, collidablesObjectArray);
+            if (!collideVerification[0]) {
+                character.y -= character.speed;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].y -= character.speed;
+                }
+            } else {
+                character.y += pushBackValue;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].y += pushBackValue;
+                }
             }
-        if (direction == "goUp") {
-             character.y -= character.speed;
-             virtualPosition.y -= character.speed;
+        }
+        if (character.movingDown) {
+            let collideVerification = verifyCollisionToObjectsArray(localSafeBox, collidablesObjectArray);
+            if (!collideVerification[0]) {
+                character.y += character.speed;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].y += character.speed;
+                }
+            } else {
+                character.y -= pushBackValue;
+                for (var i in followingObjectsArray) {
+                    followingObjectsArray[i].y -= pushBackValue;
+                }
             }
-        if (direction == "goDown") {
-             character.y += character.speed;
-             virtualPosition.y += character.speed;
-            }
+        }
+    }
 
+    function printObjectsArrayPositionOnKeyDown(keyCode, objectsArray) {
+        if (keys[keyCode]) {
+            objectsArray.forEach(element => {
+                console.log('Object type: ' + element.type, '| X: ' + element.x, '| Y: ' + element.y);
+            });
+            console.log('-------------------------XY');
+        }
+    }
+    function printObjectsArrayWidthHeightOnKeyDown(keyCode, objectsArray) {
+        if (keys[keyCode]) {
+            objectsArray.forEach(element => {
+                console.log('Object type: ' + element.type, '| Width: ' + element.width, '| Heigth: ' + element.height);
+            });
+            console.log('-------------------------WidthHeigth');
+        }
     }
 
     function gameLoop() {
         let colidingObjectsArray = [Boxes, mapArrayRawData]// if I take this map outside the gameLoop function, bullets only collide with boxes, not tiles.
         // createPlayerBox();
         // createPlayerBoxB();
-        createPlayerSafebox(playerSafebox, currentPlayerPosition.x, currentPlayerPosition.y, playerWidth, playerHeight, playerSafeMargin, playerScale)
-        createCurrentPlayerPositionXYpoint();
+
+        // setObjectWithAdjustedCoordinatesLeftTopPlusMargin(playerSafebox,playerSafeboxGraphic, currentPlayerPosition.x, currentPlayerPosition.y, playerWidth, playerHeight, playerSafeMargin, playerScale,);
+
+        drawRectangle(playerSafeboxGraphic, playerSafebox.x, playerSafebox.y, playerSafebox.width, playerSafebox.height, "0xff00ff", 0.3)
+        drawCircle(safeboxXYPoint, playerSafebox.x, playerSafebox.y, 5, "0x27FF00");
+        drawCircle(playerXYPoint, currentPlayerPosition.x, currentPlayerPosition.y, 5, "0x008FFF");
         updateBullets(protaBullets, colidingObjectsArray, app);
-        characterMovement(playerProta, currentPlayerPosition);
+        characterMovement(playerProta, [playerSafebox, currentPlayerPosition], mapArrayRawData);
+        printObjectsArrayPositionOnKeyDown("75", [playerSafebox, currentPlayerPosition, playerProta]);
+        printObjectsArrayWidthHeightOnKeyDown("73", [playerSafebox, currentPlayerPosition, playerProta]);
         characterKeysMovement(playerProta, keys["39"] || keys["68"], keys["37"] || keys["65"], keys["40"] || keys["83"], keys["38"] || keys["87"]);
     }
 

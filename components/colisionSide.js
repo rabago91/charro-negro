@@ -1,4 +1,4 @@
-export default function colides(a, b){
+export default function colidesSide(a, b){
     // a = Coliding Object, b = Scenario object
     let aRight = a.x + a.width;
     let aLeft = a.x;
